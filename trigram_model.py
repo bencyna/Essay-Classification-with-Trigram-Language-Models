@@ -83,14 +83,25 @@ class TrigramModel(object):
         and trigram counts. 
         """
    
-        self.unigramcounts = {} # might want to use defaultdict or Counter instead
-        self.bigramcounts = {} 
-        self.trigramcounts = {} 
+        self.unigramcounts = defaultdict(int) 
+        self.bigramcounts = defaultdict(int)
+        self.trigramcounts = defaultdict(int)
 
         ##Your code here
+        for sentence in corpus:
+            unigrams = get_ngrams(sentence, 1)
+            bigrams = get_ngrams(sentence, 2)
+            trigrams = get_ngrams(sentence, 3)
 
-        return
-
+            for unigram in unigrams:
+                self.unigramcounts[unigram] += 1
+            
+            for bigram in bigrams:
+                self.bigramcounts[bigram] += 1
+                
+            for trigram in trigrams:
+                self.trigramcounts[trigram] += 1
+            
     def raw_trigram_probability(self,trigram):
         """
         COMPLETE THIS METHOD (PART 3)
@@ -163,6 +174,7 @@ def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2)
             # .. 
     
         for f in os.listdir(testdir2):
+            pass
             # .. 
         
         return 0.0
@@ -171,6 +183,9 @@ if __name__ == "__main__":
 
     model = TrigramModel(sys.argv[1]) 
 
+    print(model.trigramcounts[('START','START','the')], "Expect 5478")
+    print(model.bigramcounts[('START','the')], "Expect 5478")
+    print( model.unigramcounts[('the',)], "Expect 61428")
     # put test code here...
     # or run the script from the command line with 
     # $ python -i trigram_model.py [corpus_file]
