@@ -150,7 +150,7 @@ class TrigramModel(object):
         Generate a random sentence from the trigram model. t specifies the
         max length, but the sentence may be shorter if STOP is reached.
         """
-        return result            
+        return        
 
     def smoothed_trigram_probability(self, trigram):
         """
@@ -182,9 +182,6 @@ class TrigramModel(object):
             trigram_p_sum += log_space_p
         
         return trigram_p_sum
-            
-        
-
 
 
     def perplexity(self, corpus):
@@ -192,7 +189,16 @@ class TrigramModel(object):
         COMPLETE THIS METHOD (PART 6) 
         Returns the log probability of an entire sequence.
         """
-        return float("inf") 
+        total_log_probability = 0.0
+        total_tokens = 0
+        
+        for sentence in corpus:
+            log_probability = self.sentence_logprob(sentence)
+            total_log_probability += log_probability
+            total_tokens += len(sentence)+1
+        
+        l = (1/total_tokens) * total_log_probability
+        return 2**(-l)
 
 
 def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
@@ -206,26 +212,34 @@ def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2)
         for f in os.listdir(testdir1):
             pp1 = model1.perplexity(corpus_reader(os.path.join(testdir1, f), model1.lexicon))
             pp2 = model2.perplexity(corpus_reader(os.path.join(testdir1, f), model2.lexicon))
-            # .. 
+            if pp1 < pp2:
+                correct += 1
+            total += 1 
     
         for f in os.listdir(testdir2):
-            pass
-            # .. 
+            pp1 = model1.perplexity(corpus_reader(os.path.join(testdir2, f), model1.lexicon))
+            pp2 = model2.perplexity(corpus_reader(os.path.join(testdir2, f), model2.lexicon))
+            if pp2 < pp1:
+                correct += 1
+            total += 1 
         
-        return 0.0
+        return correct/total
 
 if __name__ == "__main__":
 
-    model = TrigramModel(sys.argv[1]) 
+    # model = TrigramModel(sys.argv[1]) 
 
-    print(model.trigramcounts[('START','START','the')], "Expect 5478")
-    print(model.bigramcounts[('START','the')], "Expect 5478")
-    print( model.unigramcounts[('the',)], "Expect 61428")
-    s = ["natural", "language", "processing"]
+    # print(model.trigramcounts[('START','START','the')], "Expect 5478")
+    # print(model.bigramcounts[('START','the')], "Expect 5478")
+    # print( model.unigramcounts[('the',)], "Expect 61428")
+    # s = ["natural", "language", "processing"]
     
-    print(model.sentence_logprob(s))
-    print(model.sentence_logprob(s+s))
+    # print(model.sentence_logprob(s))
+    # print(model.sentence_logprob(s+s))
     ## expect lower probabilities for longer sentence
+    
+    
+    # print(model.perplexity(corpus_reader(sys.argv[1], model.lexicon)))
     
     # put test code here...
     # or run the script from the command line with 
@@ -243,6 +257,6 @@ if __name__ == "__main__":
 
 
     # Essay scoring experiment: 
-    # acc = essay_scoring_experiment('train_high.txt', 'train_low.txt", "test_high", "test_low")
-    # print(acc)
+    acc = essay_scoring_experiment('train_high.txt', 'train_low.txt', "test_high", "test_low")
+    print(acc)
 
